@@ -1,0 +1,157 @@
+import requests
+import pandas as pd
+import time
+from datetime import datetime, timedelta
+import json
+
+class WeatherDataCollector:
+    def __init__(self):
+        # Tọa độ HCM
+        self.lat = 10.8231
+        self.lon = 106.6297
+        
+    def get_open_meteo_data(self, start_date, end_date):
+        """
+        Lấy dữ liệu từ Open-Meteo (FREE, không cần API key)
+        """
+        url = "https://archive-api.open-meteo.com/v1/archive"
+        
+        params = {
+            "latitude": self.lat,
+            "longitude": self.lon,
+            "start_date": start_date,
+            "end_date": end_date,
+            "hourly": [
+                "temperature_2m",
+                "relative_humidity_2m", 
+                "precipitation",
+                "pressure_msl",
+                "wind_speed_10m",
+                "wind_direction_10m"
+            ],
+            "timezone": "Asia/Ho_Chi_Minh"
+        }
+        
+        response = requests.get(url, params=params)
+        if response.status_code == 200:
+            data = response.json()
+            return self.parse_open_meteo_data(data)
+        else:
+            print(f"Error: {response.status_code}")
+            return None
+    
+    def parse_open_meteo_data(self, data):
+        """Chuyển đổi data thành DataFrame"""
+        hourly = data['hourly']
+        
+        df = pd.DataFrame({
+            'datetime': pd.to_datetime(hourly['time']),
+            'temperature': hourly['temperature_2m'],
+            'humidity': hourly['relative_humidity_2m'],
+            'rainfall': hourly['precipitation'], 
+            'pressure': hourly['pressure_msl'],
+            'wind_speed': hourly['wind_speed_10m'],
+            'wind_direction': hourly['wind_direction_10m']
+        })
+        
+        return df
+    
+    def get_openweather_current(self, api_key):
+        """
+        Lấy dữ liệu current từ OpenWeatherMap (FREE tier: 1000 calls/day)
+        """
+        url = f"http://api.openweathermap.org/data/2.5/weather"
+        
+        params = {
+            'lat': self.lat,
+            'lon': self.lon,
+            'appid': api_key,
+            'units': 'metric'
+        }
+        
+        response = requests.get(url, params=params)
+        if response.status_code == 200:
+            data = response.json()
+            return {
+                'datetime': datetime.now(),
+                'temperature': data['main']['temp'],
+                'humidity': data['main']['humidity'],
+                'pressure': data['main']['pressure'],
+                'wind_speed': data['wind']['speed'],
+                'wind_direction': data['wind'].get('deg', 0),
+                'rainfall': data.get('rain', {}).get('1h', 0)
+            }
+        return None
+    
+    def collect_historical_data(self, years=3):
+        """Thu thập dữ liệu lịch sử từ Open-Meteo"""
+        end_date = datetime.now().date()
+        start_date = end_date - timedelta(days=365*years)
+        
+        print(f"Collecting data from {start_date} to {end_date}")
+        
+        # Chia nhỏ requests (max 1 year per request)
+        all_data = []
+        
+        for year in range(years):
+            year_start = start_date + timedelta(days=365*year)
+            year_end = min(year_start + timedelta(days=364), end_date)
+            
+            print(f"Getting data for {year_start} to {year_end}")
+            year_data = self.get_open_meteo_data(
+                year_start.strftime("%Y-%m-%d"),
+                year_end.strftime("%Y-%m-%d")
+            )
+            
+            if year_data is not None:
+                all_data.append(year_data)
+            
+            time.sleep(1)  # Tránh rate limiting
+        
+        if all_data:
+            final_df = pd.concat(all_data, ignore_index=True)
+            return final_df
+        
+        return None
+
+# Sử dụng
+collector = WeatherDataCollector()
+
+# Thu thập 3 năm dữ liệu lịch sử (MIỄN PHÍ)
+historical_data = collector.collect_historical_data(years=3)
+
+if historical_data is not None:
+    print(f"Collected {len(historical_data)} hourly records")
+    print(historical_data.head())
+    
+    # Lưu vào file
+    historical_data.to_csv('hcm_weather_hourly_3years.csv', index=False)
+    print("Data saved to hcm_weather_hourly_3years.csv")
+    
+    # Basic statistics
+    print("\nDataset Info:")
+    print(f"Date range: {historical_data['datetime'].min()} to {historical_data['datetime'].max()}")
+    print(f"Missing data: {historical_data.isnull().sum().sum()}")
+else:
+    print("Failed to collect data")
+
+# Thêm real-time data collection
+def setup_realtime_collection():
+    """Setup để thu thập dữ liệu real-time"""
+    
+    # Cần API key OpenWeatherMap (FREE tier)
+    api_key = "YOUR_OPENWEATHER_API_KEY"  # Đăng ký miễn phí
+    
+    def collect_hourly():
+        current_data = collector.get_openweather_current(api_key)
+        if current_data:
+            # Append vào file CSV
+            df = pd.DataFrame([current_data])
+            df.to_csv('hcm_realtime_data.csv', mode='a', header=False, index=False)
+            print(f"Collected: {current_data}")
+    
+    # Chạy mỗi giờ (có thể dùng cron job hoặc scheduled task)
+    return collect_hourly
+
+# Example usage
+realtime_collector = setup_realtime_collection()
