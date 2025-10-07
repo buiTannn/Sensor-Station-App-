@@ -123,7 +123,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   child: const Text(
                     'Đăng nhập',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                        fontSize: 16, 
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFFFCFFFF)),
                   ),
                 ),
               ),
@@ -303,7 +306,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   obscure: _hideConfirmPass,
                   onToggle: () => setState(() => _hideConfirmPass = !_hideConfirmPass)),
 
-              const SizedBox(height: 10),
+              const SizedBox(height: 40),
 
               SizedBox(
                 width: double.infinity,
@@ -318,7 +321,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ),
                   child: const Text(
                     'Đổi mật khẩu',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                        fontSize: 16, 
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFFFCFFFF)),
                   ),
                 ),
               ),
@@ -472,7 +478,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   obscure: _hideConfirm,
                   onToggle: () => setState(() => _hideConfirm = !_hideConfirm)),
 
-              const SizedBox(height: 10),
+              const SizedBox(height: 40),
 
               SizedBox(
                 width: double.infinity,
@@ -487,11 +493,40 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   child: const Text(
                     'Đăng ký',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                        fontSize: 16, 
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFFFCfFFF)),
                   ),
                 ),
               ),
               const SizedBox(height: 20),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Đã có tài khoản?",
+                    style: TextStyle(color: Colors.grey[400]),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const LoginScreen()),
+                      );
+                    },
+                    child: const Text(
+                      ' Đăng nhập',
+                      style: TextStyle(
+                        color: Color(0xFF5B4CF5),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ),
