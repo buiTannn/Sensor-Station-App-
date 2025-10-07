@@ -58,6 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFF1A1A1A),
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: SingleChildScrollView(
@@ -72,7 +73,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 10),
               const Text('Sensor Station',
-                  style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
+                  style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold , color: Colors.white,)),
               const Text(
                 'Đăng nhập',
                 style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
@@ -256,12 +257,16 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF1A1A1A),
+      
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
         backgroundColor: const Color(0xFF1A1A1A),
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
+          style: IconButton.styleFrom(
+            foregroundColor: Colors.white, // Màu của icon
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text('Quên mật khẩu'),
@@ -280,7 +285,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               const SizedBox(height: 6),
               const Text(
                 'Đặt lại mật khẩu',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 20 , color: Colors.white,),
               ),
               const SizedBox(height: 20),
 
@@ -425,6 +430,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
+          style: IconButton.styleFrom(
+            foregroundColor: Colors.white, // Màu của icon
+          ),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -442,11 +450,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
               const SizedBox(height: 6),
               const Text(
                 'Sensor Station',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold ,color: Colors.white,),
               ),
               const Text(
                 'Đăng ký tài khoản',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 14,  color: Colors.white,),
               ),
               const SizedBox(height: 10),
 
