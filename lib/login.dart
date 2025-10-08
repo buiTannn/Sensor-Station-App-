@@ -80,7 +80,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 40),
 
-              _buildField('Tên người dùng', 'user name', _username),
+              _buildField('Tên Người Dùng', 'user name', _username),
               const SizedBox(height: 12),
               _buildField('Mật khẩu', '********', _password,
                   isPassword: true,
