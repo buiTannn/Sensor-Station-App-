@@ -555,11 +555,11 @@ class _SensorMonitoringPageState extends State<SensorMonitoringPage> {
   @override
   Widget build(BuildContext context) {
     final currentData = areaData[selectedArea]!;
-
+    String dist = districts[selectedArea] ?? 'Unknown Area';
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text('Sensor Station'),
+        title: Text(districts[selectedArea] ?? 'Sensor Station'),
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
         elevation: 0,
