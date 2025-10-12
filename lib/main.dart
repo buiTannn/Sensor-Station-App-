@@ -4,8 +4,12 @@ import 'dart:async';
 import 'dart:math';
 import 'login.dart';
 import 'settings.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
@@ -135,7 +139,44 @@ class _SensorMonitoringPageState extends State<SensorMonitoringPage> {
   double windThreshold = 50.0;      
   double rainThreshold = 100.0;    
   String username = '';
+  final DatabaseReference _database = FirebaseDatabase.instance.ref();
+  void _listenToSwitchStatus() {
+      for (int i = 1; i <= 2; i++) {
+        _database
+            .child('sensor_data/Quận $i/switchStatus')
+            .onValue
+            .listen((event) {
+          if (event.snapshot.exists) {
+            final value = event.snapshot.value as bool;
+            setState(() {
+              areaData[i]!.switchStatus = value;
+            });
+          }
+        });
+      }
+    }
 
+   Future<void> _uploadToFirebase() async {
+    Map<String, dynamic> updates = {};
+
+    //dữ liệu cả 2 quận
+    for (int i = 1; i <= 2; i++) {
+      final data = areaData[i]!;
+      
+      updates['sensor_data/Quận $i'] = {
+        'username': username,
+        'temperature': data.temperature,
+        'humidity': data.humidity,
+        'windSpeed': data.windSpeed,
+        'rainLevel': data.rainLevel,
+        'switchStatus': data.switchStatus,
+        'lightStatus': data.switchStatus && data.temperature > tempThreshold ? 1 : 0, // tắt switch -> 0 
+      };
+    }
+    
+    
+    await _database.update(updates);
+    } 
   final Map<int, String> districts = {
     1: 'Quận 1',
     2: 'Quận 2',
@@ -149,13 +190,14 @@ class _SensorMonitoringPageState extends State<SensorMonitoringPage> {
     for (int i = 1; i <= 2; i++) {
       areaData[i] = SensorData();
     }
-    
+    _listenToSwitchStatus();
     sensorHistory['temperature'] = List.generate(8, (index) => 20 + _random.nextDouble() * 15);
     sensorHistory['humidity'] = List.generate(8, (index) => 40 + _random.nextDouble() * 40);
     sensorHistory['windSpeed'] = List.generate(8, (index) => _random.nextDouble() * 20);
     sensorHistory['rainLevel'] = List.generate(8, (index) => _random.nextDouble() * 10);
     
     _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
+      
       _updateSensorData();
     });
   }
@@ -199,6 +241,7 @@ class _SensorMonitoringPageState extends State<SensorMonitoringPage> {
       sensorHistory['rainLevel']!.removeAt(0);
       sensorHistory['rainLevel']!.add(areaData[selectedArea]!.rainLevel);
     });
+    _uploadToFirebase();
   }
 
   void _logout() async {
@@ -400,6 +443,7 @@ class _SensorMonitoringPageState extends State<SensorMonitoringPage> {
     }else{
       if (temperature > tempThreshold && switchStatus == true) {
         lightColor = Colors.red;
+
       } else {
         lightColor = Colors.green;
       }
