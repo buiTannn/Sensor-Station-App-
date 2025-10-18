@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensor Data Simulator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Sensor Data Simulator</h1>
+            <p>Gửi dữ liệu cảm biến random lên Firebase</p>
+        </header>
+
+        <div class="controls">
+            <button id="startBtn" class="btn btn-start">Bắt đầu</button>
+            <button id="stopBtn" class="btn btn-stop" disabled>Dừng</button>
+            <span id="status" class="status">Đã dừng</span>
+        </div>
+
+        <div class="data-display">
+            <h2>Dữ liệu hiện tại</h2>
+            
+            <div class="sensor-grid">
+                <div class="sensor-card">
+                    <h3>Quận 1</h3>
+                    <div class="sensor-data">
+                        <div class="data-item">
+                            <span class="label">Nhiệt độ:</span>
+                            <span id="temp1" class="value">--°C</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="label">Độ ẩm:</span>
+                            <span id="humidity1" class="value">--%</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="label">Tốc độ gió:</span>
+                            <span id="wind1" class="value">--m/s</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="label">Lượng mưa:</span>
+                            <span id="rain1" class="value">--mm</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="label">Switch:</span>
+                            <div id="light1" class="light off">
+                                <img src="img/light_off.png" alt="Switch OFF" class="lightbulb-icon">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sensor-card">
+                    <h3>Quận 2</h3>
+                    <div class="sensor-data">
+                        <div class="data-item">
+                            <span class="label">Nhiệt độ:</span>
+                            <span id="temp2" class="value">--°C</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="label">Độ ẩm:</span>
+                            <span id="humidity2" class="value">--%</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="label">Tốc độ gió:</span>
+                            <span id="wind2" class="value">--m/s</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="label">Lượng mưa:</span>
+                            <span id="rain2" class="value">--mm</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="label">Switch:</span>
+                            <div id="light2" class="light off">
+                                <img src="img/light_off.png" alt="Switch OFF" class="lightbulb-icon">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

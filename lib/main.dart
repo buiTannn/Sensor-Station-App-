@@ -140,43 +140,36 @@ class _SensorMonitoringPageState extends State<SensorMonitoringPage> {
   double rainThreshold = 100.0;    
   String username = '';
   final DatabaseReference _database = FirebaseDatabase.instance.ref();
-  void _listenToSwitchStatus() {
-      for (int i = 1; i <= 2; i++) {
-        _database
-            .child('sensor_data/Quận $i/switchStatus')
-            .onValue
-            .listen((event) {
-          if (event.snapshot.exists) {
-            final value = event.snapshot.value as bool;
-            setState(() {
-              areaData[i]!.switchStatus = value;
-            });
-          }
-        });
-      }
-    }
-
-   Future<void> _uploadToFirebase() async {
-    Map<String, dynamic> updates = {};
-
-    //dữ liệu cả 2 quận
+  void _listenToSensorData() {
+    // Lắng nghe tất cả dữ liệu cảm biến từ Firebase
     for (int i = 1; i <= 2; i++) {
-      final data = areaData[i]!;
-      
-      updates['sensor_data/Quận $i'] = {
-        'username': username,
-        'temperature': data.temperature,
-        'humidity': data.humidity,
-        'windSpeed': data.windSpeed,
-        'rainLevel': data.rainLevel,
-        'switchStatus': data.switchStatus,
-        'lightStatus': data.switchStatus && data.temperature > tempThreshold ? 1 : 0, // tắt switch -> 0 
-      };
+      _database
+          .child('sensor_data/Quận $i')
+          .onValue
+          .listen((event) {
+        if (event.snapshot.exists) {
+          final data = event.snapshot.value as Map<dynamic, dynamic>;
+          setState(() {
+            areaData[i]!.temperature = (data['temperature'] ?? 0.0).toDouble();
+            areaData[i]!.humidity = (data['humidity'] ?? 0.0).toDouble();
+            areaData[i]!.windSpeed = (data['windSpeed'] ?? 0.0).toDouble();
+            areaData[i]!.rainLevel = (data['rainLevel'] ?? 0.0).toDouble();
+            areaData[i]!.switchStatus = data['switchStatus'] ?? false;
+          });
+        }
+      });
     }
-    
-    
-    await _database.update(updates);
-    } 
+  }
+
+  Future<void> _updateSwitchStatus(int area, bool status) async {
+    // Chỉ cập nhật trạng thái switch lên Firebase
+    try {
+      await _database.child('sensor_data/Quận $area/switchStatus').set(status);
+      print('Switch status updated for Quận $area: $status');
+    } catch (e) {
+      print('Error updating switch status: $e');
+    }
+  } 
   final Map<int, String> districts = {
     1: 'Quận 1',
     2: 'Quận 2',
@@ -190,14 +183,14 @@ class _SensorMonitoringPageState extends State<SensorMonitoringPage> {
     for (int i = 1; i <= 2; i++) {
       areaData[i] = SensorData();
     }
-    _listenToSwitchStatus();
+    _listenToSensorData();
     sensorHistory['temperature'] = List.generate(8, (index) => 20 + _random.nextDouble() * 15);
     sensorHistory['humidity'] = List.generate(8, (index) => 40 + _random.nextDouble() * 40);
     sensorHistory['windSpeed'] = List.generate(8, (index) => _random.nextDouble() * 20);
     sensorHistory['rainLevel'] = List.generate(8, (index) => _random.nextDouble() * 10);
     
     _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
-      
+      // Chỉ cập nhật lịch sử dữ liệu, không tạo dữ liệu mới
       _updateSensorData();
     });
   }
@@ -216,19 +209,8 @@ class _SensorMonitoringPageState extends State<SensorMonitoringPage> {
   }
 
   void _updateSensorData() {
+    // Chỉ cập nhật lịch sử dữ liệu từ Firebase, không tạo dữ liệu random
     setState(() {
-      for (int i = 1; i <= 2; i++) {
-        double baseTemp = i == 1 ? 25.0 : 28.0;
-        double baseHumidity = i == 1 ? 60.0 : 55.0;
-        double baseWind = i == 1 ? 5.0 : 7.0;
-        double baseRain = i == 1 ? 2.0 : 1.0;
-        
-        areaData[i]!.temperature = baseTemp + _random.nextDouble() * 10;
-        areaData[i]!.humidity = baseHumidity + _random.nextDouble() * 25;
-        areaData[i]!.windSpeed = baseWind + _random.nextDouble() * 10;
-        areaData[i]!.rainLevel = baseRain + _random.nextDouble() * 5;
-      }
-      
       sensorHistory['temperature']!.removeAt(0);
       sensorHistory['temperature']!.add(areaData[selectedArea]!.temperature);
       
@@ -241,7 +223,6 @@ class _SensorMonitoringPageState extends State<SensorMonitoringPage> {
       sensorHistory['rainLevel']!.removeAt(0);
       sensorHistory['rainLevel']!.add(areaData[selectedArea]!.rainLevel);
     });
-    _uploadToFirebase();
   }
 
   void _logout() async {
@@ -716,6 +697,8 @@ class _SensorMonitoringPageState extends State<SensorMonitoringPage> {
               setState(() {
                 currentData.switchStatus = value;
               });
+              // Cập nhật trạng thái switch lên Firebase
+              _updateSwitchStatus(selectedArea, value);
             },
           ),
           
