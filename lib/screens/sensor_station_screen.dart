@@ -1,8 +1,43 @@
 import 'package:flutter/material.dart';
-import 'main.dart';
+import 'sensor_monitoring_screen.dart';
+import 'district_management_screen.dart';
+import '../services/storage_service.dart';
 
-class SensorStationScreen extends StatelessWidget {
+class SensorStationScreen extends StatefulWidget {
   const SensorStationScreen({super.key});
+
+  @override
+  State<SensorStationScreen> createState() => _SensorStationScreenState();
+}
+
+class _SensorStationScreenState extends State<SensorStationScreen> {
+  List<String> districts = ['Quận 1', 'Quận 2'];
+  final Map<String, Color> districtColors = {
+    'Quận 1': Colors.orange,
+    'Quận 2': Colors.redAccent,
+    'Quận 3': Colors.green,
+    'Quận 4': Colors.purple,
+    'Quận 5': Colors.cyan,
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDistricts();
+  }
+
+  Future<void> _loadDistricts() async {
+    final savedDistricts = await StorageService.getDistricts();
+    setState(() {
+      districts = savedDistricts.isNotEmpty
+          ? savedDistricts
+          : ['Quận 1', 'Quận 2'];
+    });
+  }
+
+  Color _getDistrictColor(String districtName) {
+    return districtColors[districtName] ?? Colors.grey;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +58,15 @@ class SensorStationScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.settings, color: Colors.white),
-            onPressed: () {},
+            onPressed: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const DistrictManagementScreen(),
+                ),
+              );
+              _loadDistricts(); // Reload districts after returning
+            },
           ),
         ],
       ),
@@ -34,11 +77,7 @@ class SensorStationScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 10),
-              Image.asset(
-                'assets/images/sensor.png',
-                width: 120,
-                height: 120,
-              ),
+              Image.asset('assets/images/sensor.png', width: 120, height: 120),
               const SizedBox(height: 10),
               const Text(
                 'Sensor Station',
@@ -50,30 +89,19 @@ class SensorStationScreen extends StatelessWidget {
               ),
               const Text(
                 'Chọn khu vực cần giám sát',
-                style: TextStyle(
-                  fontSize: 15,
-                  color: Colors.white70,
-                ),
+                style: TextStyle(fontSize: 15, color: Colors.white70),
               ),
-              const SizedBox(height: 30), 
-              _buildZoneCard(
-                context,
-                zoneName: "Quận 1",
-                areaId: 1,
-                borderColor: Colors.orange,
-              ),
-              _buildZoneCard(
-                context,
-                zoneName: "Quận 2",
-                areaId: 2,
-                borderColor: Colors.redAccent,
-              ),
-              _buildZoneCard(
-                context,
-                zoneName: "Quận 3",
-                areaId: 3,
-                borderColor: const Color.fromARGB(255, 84, 243, 131),
-              ),
+              const SizedBox(height: 30),
+              ...districts.asMap().entries.map((entry) {
+                final index = entry.key;
+                final district = entry.value;
+                return _buildZoneCard(
+                  context,
+                  zoneName: district,
+                  areaId: index + 1,
+                  borderColor: _getDistrictColor(district),
+                );
+              }).toList(),
             ],
           ),
         ),
@@ -81,11 +109,10 @@ class SensorStationScreen extends StatelessWidget {
     );
   }
 
-
   Widget _buildZoneCard(
     BuildContext context, {
     required String zoneName,
-    required int areaId, 
+    required int areaId,
     required Color borderColor,
   }) {
     return GestureDetector(
@@ -109,7 +136,7 @@ class SensorStationScreen extends StatelessWidget {
               color: borderColor.withOpacity(0.3),
               blurRadius: 6,
               offset: const Offset(0, 4),
-            )
+            ),
           ],
         ),
         child: Column(

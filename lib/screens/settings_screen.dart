@@ -35,10 +35,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void initState() {
     super.initState();
-    _tempController = TextEditingController(text: widget.tempThreshold.toInt().toString());
-    _humidityController = TextEditingController(text: widget.humidityThreshold.toInt().toString());
-    _windController = TextEditingController(text: widget.windThreshold.toInt().toString());
-    _rainController = TextEditingController(text: widget.rainThreshold.toInt().toString());
+    _tempController = TextEditingController(
+      text: widget.tempThreshold.toInt().toString(),
+    );
+    _humidityController = TextEditingController(
+      text: widget.humidityThreshold.toInt().toString(),
+    );
+    _windController = TextEditingController(
+      text: widget.windThreshold.toInt().toString(),
+    );
+    _rainController = TextEditingController(
+      text: widget.rainThreshold.toInt().toString(),
+    );
   }
 
   @override
@@ -193,10 +201,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               const SizedBox(width: 12),
               Text(
                 '(${minValue.toInt()}-${maxValue.toInt()})',
-                style: TextStyle(
-                  color: Colors.grey.shade500,
-                  fontSize: 12,
-                ),
+                style: TextStyle(color: Colors.grey.shade500, fontSize: 12),
               ),
             ],
           ),

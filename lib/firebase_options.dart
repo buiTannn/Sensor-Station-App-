@@ -41,53 +41,54 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyAxxU0DYmZw91UPLGXg_gCqkp4-aJeqP_A',
-    appId: '1:516964404381:web:62d7afef8c698de67d5874',
-    messagingSenderId: '516964404381',
-    projectId: 'project-a0bfe',
-    authDomain: 'project-a0bfe.firebaseapp.com',
-    databaseURL: 'https://project-a0bfe-default-rtdb.firebaseio.com',
-    storageBucket: 'project-a0bfe.firebasestorage.app',
-    measurementId: 'G-02N8V6YHD5',
+    apiKey: 'AIzaSyC8xaoqHsebUuqf4AKD6y17CEygiCMX1I0',
+    appId: '1:818251514993:web:34e3b38986a315bd5947d0',
+    messagingSenderId: '818251514993',
+    projectId: 'sensor-staion',
+    authDomain: 'sensor-staion.firebaseapp.com',
+    databaseURL: 'https://sensor-staion-default-rtdb.firebaseio.com',
+    storageBucket: 'sensor-staion.firebasestorage.app',
+    measurementId: 'G-50HK970JFE',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyB_moqOxwN42uT-a3mx4xrrpLQcx2x4qDg',
-    appId: '1:516964404381:android:aa0eeeab039cda5d7d5874',
-    messagingSenderId: '516964404381',
-    projectId: 'project-a0bfe',
-    databaseURL: 'https://project-a0bfe-default-rtdb.firebaseio.com',
-    storageBucket: 'project-a0bfe.firebasestorage.app',
+    apiKey: 'AIzaSyCy_Gxj48QL15Ls9rfMiV0JZs5RdXwtY4U',
+    appId: '1:818251514993:android:23f5a0c689d5d4be5947d0',
+    messagingSenderId: '818251514993',
+    projectId: 'sensor-staion',
+    databaseURL: 'https://sensor-staion-default-rtdb.firebaseio.com',
+    storageBucket: 'sensor-staion.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBDZD79k4U6EtfatZ5JdYn25EOEMtC77jU',
-    appId: '1:516964404381:ios:9fc3a5fecfd0445c7d5874',
-    messagingSenderId: '516964404381',
-    projectId: 'project-a0bfe',
-    databaseURL: 'https://project-a0bfe-default-rtdb.firebaseio.com',
-    storageBucket: 'project-a0bfe.firebasestorage.app',
+    apiKey: 'AIzaSyDLPjPq9tNqthqwOROmicNohwc_7kDPyWw',
+    appId: '1:818251514993:ios:18b712021b3f4c9b5947d0',
+    messagingSenderId: '818251514993',
+    projectId: 'sensor-staion',
+    databaseURL: 'https://sensor-staion-default-rtdb.firebaseio.com',
+    storageBucket: 'sensor-staion.firebasestorage.app',
     iosBundleId: 'com.example.flutterApplication1',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyBDZD79k4U6EtfatZ5JdYn25EOEMtC77jU',
-    appId: '1:516964404381:ios:9fc3a5fecfd0445c7d5874',
-    messagingSenderId: '516964404381',
-    projectId: 'project-a0bfe',
-    databaseURL: 'https://project-a0bfe-default-rtdb.firebaseio.com',
-    storageBucket: 'project-a0bfe.firebasestorage.app',
+    apiKey: 'AIzaSyDLPjPq9tNqthqwOROmicNohwc_7kDPyWw',
+    appId: '1:818251514993:ios:18b712021b3f4c9b5947d0',
+    messagingSenderId: '818251514993',
+    projectId: 'sensor-staion',
+    databaseURL: 'https://sensor-staion-default-rtdb.firebaseio.com',
+    storageBucket: 'sensor-staion.firebasestorage.app',
     iosBundleId: 'com.example.flutterApplication1',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyAxxU0DYmZw91UPLGXg_gCqkp4-aJeqP_A',
-    appId: '1:516964404381:web:62d7afef8c698de67d5874',
-    messagingSenderId: '516964404381',
-    projectId: 'project-a0bfe',
-    authDomain: 'project-a0bfe.firebaseapp.com',
-    databaseURL: 'https://project-a0bfe-default-rtdb.firebaseio.com',
-    storageBucket: 'project-a0bfe.firebasestorage.app',
-    measurementId: 'G-02N8V6YHD5',
+    apiKey: 'AIzaSyC8xaoqHsebUuqf4AKD6y17CEygiCMX1I0',
+    appId: '1:818251514993:web:fa80210824f8ad0e5947d0',
+    messagingSenderId: '818251514993',
+    projectId: 'sensor-staion',
+    authDomain: 'sensor-staion.firebaseapp.com',
+    databaseURL: 'https://sensor-staion-default-rtdb.firebaseio.com',
+    storageBucket: 'sensor-staion.firebasestorage.app',
+    measurementId: 'G-LP1HJQM4RJ',
   );
+
 }

@@ -1,5 +1,5 @@
 // Firebase Configuration
-const FIREBASE_URL = "https://project-a0bfe-default-rtdb.firebaseio.com";
+const FIREBASE_URL = "https://sensor-staion-default-rtdb.firebaseio.com";
 const DATABASE_PATH = "/sensor_data";
 
 // Global variables
@@ -19,6 +19,20 @@ let currentData = {
         windSpeed: 0,
         rainLevel: 0,
         switchStatus: false
+    },
+    "Quận 3": {
+        temperature: 0,
+        humidity: 0,
+        windSpeed: 0,
+        rainLevel: 0,
+        switchStatus: false
+    },
+    "Quận 4": {
+        temperature: 0,
+        humidity: 0,
+        windSpeed: 0,
+        rainLevel: 0,
+        switchStatus: false
     }
 };
 
@@ -31,21 +45,95 @@ const status = document.getElementById('status');
 document.addEventListener('DOMContentLoaded', function() {
     startBtn.addEventListener('click', startSimulator);
     stopBtn.addEventListener('click', stopSimulator);
+    initializeFirebaseData();
     loadCurrentData();
 });
+
+// Initialize Firebase data structure and start sending data
+async function initializeFirebaseData() {
+    try {
+        status.textContent = 'Đang khởi tạo...';
+        
+        // Tạo cấu trúc JSON ban đầu cho tất cả quận
+        const initialData = {
+            "Quận 1": {
+                temperature: 25.5,
+                humidity: 60.0,
+                windSpeed: 5.2,
+                rainLevel: 0.0,
+                switchStatus: false,
+                timestamp: new Date().toISOString()
+            },
+            "Quận 2": {
+                temperature: 26.1,
+                humidity: 65.0,
+                windSpeed: 4.8,
+                rainLevel: 0.0,
+                switchStatus: true,
+                timestamp: new Date().toISOString()
+            },
+            "Quận 3": {
+                temperature: 26.5,
+                humidity: 65.0,
+                windSpeed: 6.0,
+                rainLevel: 1.5,
+                switchStatus: false,
+                timestamp: new Date().toISOString()
+            },
+            "Quận 4": {
+                temperature: 29.0,
+                humidity: 50.0,
+                windSpeed: 8.0,
+                rainLevel: 0.5,
+                switchStatus: false,
+                timestamp: new Date().toISOString()
+            }
+        };
+
+        // Gửi dữ liệu khởi tạo lên Firebase
+        const success = await sendToFirebase(initialData);
+        if (success) {
+            
+            // Tự động bắt đầu gửi dữ liệu
+            await startDataTransmission();
+        } else {
+            status.textContent = 'Lỗi khởi tạo dữ liệu';
+        }
+    } catch (error) {
+        status.textContent = 'Lỗi khởi tạo dữ liệu';
+    }
+}
+
+// Start automatic data transmission
+async function startDataTransmission() {
+    if (isRunning) return;
+    
+    isRunning = true;
+    startBtn.disabled = true;
+    stopBtn.disabled = false;
+    status.textContent = 'Đang gửi dữ liệu...';
+    status.classList.add('running');
+    
+    
+    // Set interval to send data every 7 seconds
+    intervalId = setInterval(async () => {
+        const sensorData = await generateSensorData();
+        sendToFirebase(sensorData);
+    }, 7000);
+}
 
 // Generate random sensor data
 async function generateSensorData() {
     const data = {};
     
-    for (let i = 1; i <= 2; i++) {
+    for (let i = 1; i <= 4; i++) {
         const districtName = `Quận ${i}`;
         
         // Base values khác nhau cho mỗi quận
-        const baseTemp = i === 1 ? 25.0 : 28.0;
-        const baseHumidity = i === 1 ? 60.0 : 55.0;
-        const baseWind = i === 1 ? 5.0 : 7.0;
-        const baseRain = i === 1 ? 2.0 : 1.0;
+        const baseTemp = i === 1 ? 25.0 : i === 2 ? 28.0 : i === 3 ? 26.5 : 29.0;
+        const baseHumidity = i === 1 ? 60.0 : i === 2 ? 55.0 : i === 3 ? 65.0 : 50.0;
+        const baseWind = i === 1 ? 5.0 : i === 2 ? 7.0 : i === 3 ? 6.0 : 8.0;
+        const baseRain = i === 1 ? 2.0 : i === 2 ? 1.0 : i === 3 ? 1.5 : 0.5;
         
         // Tạo dữ liệu random
         const temperature = Math.round((baseTemp + Math.random() * 10 - 5) * 10) / 10;
@@ -81,7 +169,6 @@ async function getCurrentSwitchStatus(districtName) {
         }
         return false;
     } catch (error) {
-        console.log(`Error reading switch status for ${districtName}:`, error);
         return false;
     }
 }
@@ -106,11 +193,9 @@ async function sendToFirebase(data) {
             
             return true;
         } else {
-            console.log(`Failed to send data: HTTP ${response.status}`);
             return false;
         }
     } catch (error) {
-        console.log(`Network error: ${error.message}`);
         return false;
     }
 }
@@ -129,25 +214,46 @@ async function loadCurrentData() {
             }
         }
     } catch (error) {
-        console.log(`Error loading data: ${error.message}`);
     }
 }
 
 // Update display with current data
 function updateDisplay() {
     // Update Quận 1
-    document.getElementById('temp1').textContent = `${currentData['Quận 1'].temperature}°C`;
-    document.getElementById('humidity1').textContent = `${currentData['Quận 1'].humidity}%`;
-    document.getElementById('wind1').textContent = `${currentData['Quận 1'].windSpeed}m/s`;
-    document.getElementById('rain1').textContent = `${currentData['Quận 1'].rainLevel}mm`;
-    updateLightStatus('light1', currentData['Quận 1'].switchStatus, currentData['Quận 1'].temperature);
+    if (currentData['Quận 1']) {
+        document.getElementById('temp1').textContent = `${currentData['Quận 1'].temperature}°C`;
+        document.getElementById('humidity1').textContent = `${currentData['Quận 1'].humidity}%`;
+        document.getElementById('wind1').textContent = `${currentData['Quận 1'].windSpeed}m/s`;
+        document.getElementById('rain1').textContent = `${currentData['Quận 1'].rainLevel}mm`;
+        updateLightStatus('light1', currentData['Quận 1'].switchStatus, currentData['Quận 1'].temperature);
+    }
     
     // Update Quận 2
-    document.getElementById('temp2').textContent = `${currentData['Quận 2'].temperature}°C`;
-    document.getElementById('humidity2').textContent = `${currentData['Quận 2'].humidity}%`;
-    document.getElementById('wind2').textContent = `${currentData['Quận 2'].windSpeed}m/s`;
-    document.getElementById('rain2').textContent = `${currentData['Quận 2'].rainLevel}mm`;
-    updateLightStatus('light2', currentData['Quận 2'].switchStatus, currentData['Quận 2'].temperature);
+    if (currentData['Quận 2']) {
+        document.getElementById('temp2').textContent = `${currentData['Quận 2'].temperature}°C`;
+        document.getElementById('humidity2').textContent = `${currentData['Quận 2'].humidity}%`;
+        document.getElementById('wind2').textContent = `${currentData['Quận 2'].windSpeed}m/s`;
+        document.getElementById('rain2').textContent = `${currentData['Quận 2'].rainLevel}mm`;
+        updateLightStatus('light2', currentData['Quận 2'].switchStatus, currentData['Quận 2'].temperature);
+    }
+    
+    // Update Quận 3 (nếu có trong HTML)
+    if (currentData['Quận 3'] && document.getElementById('temp3')) {
+        document.getElementById('temp3').textContent = `${currentData['Quận 3'].temperature}°C`;
+        document.getElementById('humidity3').textContent = `${currentData['Quận 3'].humidity}%`;
+        document.getElementById('wind3').textContent = `${currentData['Quận 3'].windSpeed}m/s`;
+        document.getElementById('rain3').textContent = `${currentData['Quận 3'].rainLevel}mm`;
+        updateLightStatus('light3', currentData['Quận 3'].switchStatus, currentData['Quận 3'].temperature);
+    }
+    
+    // Update Quận 4 (nếu có trong HTML)
+    if (currentData['Quận 4'] && document.getElementById('temp4')) {
+        document.getElementById('temp4').textContent = `${currentData['Quận 4'].temperature}°C`;
+        document.getElementById('humidity4').textContent = `${currentData['Quận 4'].humidity}%`;
+        document.getElementById('wind4').textContent = `${currentData['Quận 4'].windSpeed}m/s`;
+        document.getElementById('rain4').textContent = `${currentData['Quận 4'].rainLevel}mm`;
+        updateLightStatus('light4', currentData['Quận 4'].switchStatus, currentData['Quận 4'].temperature);
+    }
 }
 
 // Update light status
@@ -172,27 +278,11 @@ function updateLightStatus(lightId, switchStatus, temperature) {
 }
 
 
-// Start simulator
+// Start simulator (restart data transmission)
 async function startSimulator() {
     if (isRunning) return;
     
-    isRunning = true;
-    startBtn.disabled = true;
-    stopBtn.disabled = false;
-    status.textContent = 'Đang chạy';
-    status.classList.add('running');
-    
-    console.log('Starting sensor data simulator...');
-    
-    // Send data immediately
-    const sensorData = await generateSensorData();
-    sendToFirebase(sensorData);
-    
-    // Set interval to send data every 3 seconds
-    intervalId = setInterval(async () => {
-        const sensorData = await generateSensorData();
-        sendToFirebase(sensorData);
-    }, 7000);
+    await startDataTransmission();
 }
 
 // Stop simulator
@@ -202,7 +292,7 @@ function stopSimulator() {
     isRunning = false;
     startBtn.disabled = false;
     stopBtn.disabled = true;
-    status.textContent = 'Đã dừng';
+    status.textContent = 'Đã dừng - Click "Bắt đầu" để tiếp tục';
     status.classList.remove('running');
     
     if (intervalId) {
@@ -210,7 +300,6 @@ function stopSimulator() {
         intervalId = null;
     }
     
-    console.log('Sensor data simulator stopped');
 }
 
 // Handle page unload

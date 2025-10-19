@@ -1,14 +1,14 @@
 {
   "project_info": {
-    "project_number": "516964404381",
-    "firebase_url": "https://project-a0bfe-default-rtdb.firebaseio.com",
-    "project_id": "project-a0bfe",
-    "storage_bucket": "project-a0bfe.firebasestorage.app"
+    "project_number": "818251514993",
+    "firebase_url": "https://sensor-staion-default-rtdb.firebaseio.com",
+    "project_id": "sensor-staion",
+    "storage_bucket": "sensor-staion.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:516964404381:android:aa0eeeab039cda5d7d5874",
+        "mobilesdk_app_id": "1:818251514993:android:23f5a0c689d5d4be5947d0",
         "android_client_info": {
           "package_name": "com.example.flutter_application_1"
         }
@@ -16,7 +16,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyB_moqOxwN42uT-a3mx4xrrpLQcx2x4qDg"
+          "current_key": "AIzaSyCy_Gxj48QL15Ls9rfMiV0JZs5RdXwtY4U"
         }
       ],
       "services": {
