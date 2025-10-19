@@ -11,7 +11,7 @@ class SettingsScreen extends StatefulWidget {
   final Function(double) onRainThresholdChanged;
 
   const SettingsScreen({
-    Key? key,
+    super.key,
     required this.tempThreshold,
     required this.humidityThreshold,
     required this.windThreshold,
@@ -20,7 +20,7 @@ class SettingsScreen extends StatefulWidget {
     required this.onHumidityThresholdChanged,
     required this.onWindThresholdChanged,
     required this.onRainThresholdChanged,
-  }) : super(key: key);
+  });
 
   @override
   _SettingsScreenState createState() => _SettingsScreenState();

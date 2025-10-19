@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'main.dart';
+import 'sensor_station.dart';
+
 
 class SensorStationApp extends StatelessWidget {
-  const SensorStationApp({Key? key}) : super(key: key);
+  const SensorStationApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +22,7 @@ class SensorStationApp extends StatelessWidget {
 
 //LOGIN SCREEN
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -44,7 +46,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (savedUser == _username.text && savedPass == _password.text) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const SensorMonitoringPage()),
+        MaterialPageRoute(builder: (context) => const  SensorStationScreen()),
       );
     } else {
       _showMsg('Sai tài khoản hoặc mật khẩu');
@@ -205,7 +207,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
 // FORGOT PASSWORD SCREEN
 class ForgotPasswordScreen extends StatefulWidget {
-  const ForgotPasswordScreen({Key? key}) : super(key: key);
+  const ForgotPasswordScreen({super.key});
 
   @override
   State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
@@ -385,7 +387,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
 // REGISTER SCREEN
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({Key? key}) : super(key: key);
+  const RegisterScreen({super.key});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();

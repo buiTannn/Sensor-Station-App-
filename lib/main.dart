@@ -6,6 +6,8 @@ import 'login.dart';
 import 'settings.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'sensor_station.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,7 +16,7 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +33,7 @@ class MyApp extends StatelessWidget {
 }
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({Key? key}) : super(key: key);
+  const SplashScreen({super.key});
 
   @override
   _SplashScreenState createState() => _SplashScreenState();
@@ -121,14 +123,15 @@ class SensorData {
 }
 
 class SensorMonitoringPage extends StatefulWidget {
-  const SensorMonitoringPage({Key? key}) : super(key: key);
+  final int areaId; // Thêm areaId
+  const SensorMonitoringPage({super.key, this.areaId = 1}); // default = 1
 
   @override
   _SensorMonitoringPageState createState() => _SensorMonitoringPageState();
 }
 
 class _SensorMonitoringPageState extends State<SensorMonitoringPage> {
-  int selectedArea = 1;
+  late int selectedArea;
   String selectedSensor = 'temperature';
   Map<int, SensorData> areaData = {};
   Map<String, List<double>> sensorHistory = {};
@@ -178,6 +181,7 @@ class _SensorMonitoringPageState extends State<SensorMonitoringPage> {
   @override
   void initState() {
     super.initState();
+    selectedArea = widget.areaId;
     _loadUserData();
     
     for (int i = 1; i <= 2; i++) {
@@ -457,7 +461,7 @@ class _SensorMonitoringPageState extends State<SensorMonitoringPage> {
           Switch(
             value: switchStatus,
             onChanged: onSwitchChanged,
-            activeColor: Colors.green,
+            activeThumbColor: Colors.green,
             materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
           const SizedBox(width: 12),
