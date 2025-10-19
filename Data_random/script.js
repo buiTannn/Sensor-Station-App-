@@ -1,5 +1,5 @@
 // Firebase Configuration
-const FIREBASE_URL = "https://project-a0bfe-default-rtdb.firebaseio.com";
+const FIREBASE_URL = "https://sensor-station-e536d-default-rtdb.firebaseio.com/";
 const DATABASE_PATH = "/sensor_data";
 
 // Global variables
@@ -42,16 +42,16 @@ async function generateSensorData() {
         const districtName = `Quận ${i}`;
         
         // Base values khác nhau cho mỗi quận
-        const baseTemp = i === 1 ? 25.0 : 28.0;
+        const baseTemp = i === 1 ? 28.0 : 30.0;
         const baseHumidity = i === 1 ? 60.0 : 55.0;
         const baseWind = i === 1 ? 5.0 : 7.0;
         const baseRain = i === 1 ? 2.0 : 1.0;
         
         // Tạo dữ liệu random
-        const temperature = Math.round((baseTemp + Math.random() * 10 - 5) * 10) / 10;
-        const humidity = Math.round((baseHumidity + Math.random() * 25 - 20) * 10) / 10;
-        const windSpeed = Math.round((baseWind + Math.random() * 10 - 2) * 10) / 10;
-        const rainLevel = Math.round((baseRain + Math.random() * 5 - 1) * 10) / 10;
+        const temperature = Math.round((25 + Math.random() * 15) * 10) / 10;      // 25-40°C
+        const humidity = Math.round((40 + Math.random() * 50) * 10) / 10;         // 40-90%
+        const windSpeed = Math.round((Math.random() * 60) * 10) / 10;             // 0-60 m/s
+        const rainLevel = Math.round((Math.random() * 100) * 10) / 10;   
         
         // Đọc switchStatus hiện tại từ Firebase
         const currentSwitch = await getCurrentSwitchStatus(districtName);
@@ -62,7 +62,6 @@ async function generateSensorData() {
             windSpeed: windSpeed,
             rainLevel: rainLevel,
             switchStatus: currentSwitch,
-            timestamp: new Date().toISOString()
         };
     }
     
@@ -166,7 +165,7 @@ function updateLightStatus(lightId, switchStatus, temperature) {
         icon.alt = 'Switch ON (Warning)';
     } else {
         light.classList.add('on');
-        icon.src = 'img/light_on.png';
+        icon.src = 'img/green.png';
         icon.alt = 'Switch ON';
     }
 }

@@ -12,20 +12,6 @@ class SensorStationScreen extends StatelessWidget {
         backgroundColor: const Color(0xFF1A1A1A),
         elevation: 0,
         centerTitle: true,
-        title: const Text(
-          'Sensor Station',
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings, color: Colors.white),
-            onPressed: () {},
-          ),
-        ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -67,12 +53,6 @@ class SensorStationScreen extends StatelessWidget {
                 zoneName: "Quận 2",
                 areaId: 2,
                 borderColor: Colors.redAccent,
-              ),
-              _buildZoneCard(
-                context,
-                zoneName: "Quận 3",
-                areaId: 3,
-                borderColor: const Color.fromARGB(255, 84, 243, 131),
               ),
             ],
           ),

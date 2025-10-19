@@ -1,14 +1,14 @@
 {
   "project_info": {
-    "project_number": "516964404381",
-    "firebase_url": "https://project-a0bfe-default-rtdb.firebaseio.com",
-    "project_id": "project-a0bfe",
-    "storage_bucket": "project-a0bfe.firebasestorage.app"
+    "project_number": "152568577193",
+    "firebase_url": "https://sensor-station-e536d-default-rtdb.firebaseio.com",
+    "project_id": "sensor-station-e536d",
+    "storage_bucket": "sensor-station-e536d.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:516964404381:android:aa0eeeab039cda5d7d5874",
+        "mobilesdk_app_id": "1:152568577193:android:6d13416db83800c76e7db8",
         "android_client_info": {
           "package_name": "com.example.flutter_application_1"
         }
@@ -16,7 +16,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyB_moqOxwN42uT-a3mx4xrrpLQcx2x4qDg"
+          "current_key": "AIzaSyDNia_eNsDVp_4jDXLH05Vl_zjnlobXduU"
         }
       ],
       "services": {

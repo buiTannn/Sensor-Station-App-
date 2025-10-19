@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'main.dart';
-import 'sensor_station.dart';
+import 'arena.dart';
 
 
 class SensorStationApp extends StatelessWidget {

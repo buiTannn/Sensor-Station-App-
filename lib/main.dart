@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
-import 'dart:math';
 import 'login.dart';
 import 'settings.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'sensor_station.dart';
-
+import 'arena.dart';
+import 'package:fl_chart/fl_chart.dart'; // Thêm import này
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -123,8 +122,8 @@ class SensorData {
 }
 
 class SensorMonitoringPage extends StatefulWidget {
-  final int areaId; // Thêm areaId
-  const SensorMonitoringPage({super.key, this.areaId = 1}); // default = 1
+  final int areaId;
+  const SensorMonitoringPage({super.key, this.areaId = 1});
 
   @override
   _SensorMonitoringPageState createState() => _SensorMonitoringPageState();
@@ -136,20 +135,21 @@ class _SensorMonitoringPageState extends State<SensorMonitoringPage> {
   Map<int, SensorData> areaData = {};
   Map<String, List<double>> sensorHistory = {};
   Timer? _timer;
-  final Random _random = Random();
   double tempThreshold = 30.0;
   double humidityThreshold = 80.0; 
   double windThreshold = 50.0;      
   double rainThreshold = 100.0;    
   String username = '';
   final DatabaseReference _database = FirebaseDatabase.instance.ref();
+  
+  final Map<int, String> districts = {
+    1: 'Quận 1',
+    2: 'Quận 2',
+  };
+
   void _listenToSensorData() {
-    // Lắng nghe tất cả dữ liệu cảm biến từ Firebase
     for (int i = 1; i <= 2; i++) {
-      _database
-          .child('sensor_data/Quận $i')
-          .onValue
-          .listen((event) {
+      _database.child('sensor_data/Quận $i').onValue.listen((event) {
         if (event.snapshot.exists) {
           final data = event.snapshot.value as Map<dynamic, dynamic>;
           setState(() {
@@ -165,18 +165,13 @@ class _SensorMonitoringPageState extends State<SensorMonitoringPage> {
   }
 
   Future<void> _updateSwitchStatus(int area, bool status) async {
-    // Chỉ cập nhật trạng thái switch lên Firebase
     try {
       await _database.child('sensor_data/Quận $area/switchStatus').set(status);
       print('Switch status updated for Quận $area: $status');
     } catch (e) {
       print('Error updating switch status: $e');
     }
-  } 
-  final Map<int, String> districts = {
-    1: 'Quận 1',
-    2: 'Quận 2',
-  };
+  }
 
   @override
   void initState() {
@@ -187,14 +182,16 @@ class _SensorMonitoringPageState extends State<SensorMonitoringPage> {
     for (int i = 1; i <= 2; i++) {
       areaData[i] = SensorData();
     }
+    
+    // Khởi tạo với giá trị mặc định
+    sensorHistory['temperature'] = List.generate(8, (index) => 25.0);
+    sensorHistory['humidity'] = List.generate(8, (index) => 60.0);
+    sensorHistory['windSpeed'] = List.generate(8, (index) => 5.0);
+    sensorHistory['rainLevel'] = List.generate(8, (index) => 0.0);
+    
     _listenToSensorData();
-    sensorHistory['temperature'] = List.generate(8, (index) => 20 + _random.nextDouble() * 15);
-    sensorHistory['humidity'] = List.generate(8, (index) => 40 + _random.nextDouble() * 40);
-    sensorHistory['windSpeed'] = List.generate(8, (index) => _random.nextDouble() * 20);
-    sensorHistory['rainLevel'] = List.generate(8, (index) => _random.nextDouble() * 10);
     
     _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
-      // Chỉ cập nhật lịch sử dữ liệu, không tạo dữ liệu mới
       _updateSensorData();
     });
   }
@@ -213,7 +210,6 @@ class _SensorMonitoringPageState extends State<SensorMonitoringPage> {
   }
 
   void _updateSensorData() {
-    // Chỉ cập nhật lịch sử dữ liệu từ Firebase, không tạo dữ liệu random
     setState(() {
       sensorHistory['temperature']!.removeAt(0);
       sensorHistory['temperature']!.add(areaData[selectedArea]!.temperature);
@@ -364,6 +360,11 @@ class _SensorMonitoringPageState extends State<SensorMonitoringPage> {
 
   Widget _buildChart() {
     List<double> data = sensorHistory[selectedSensor]!;
+    Color chartColor = _getSensorColor();
+    double minVal = data.reduce((a, b) => a < b ? a : b);
+    double maxVal = data.reduce((a, b) => a > b ? a : b);
+    double range = (maxVal - minVal == 0) ? 1 : maxVal - minVal;
+    
     return Container(
       height: 200,
       margin: const EdgeInsets.fromLTRB(12, 8, 12, 4),
@@ -381,38 +382,47 @@ class _SensorMonitoringPageState extends State<SensorMonitoringPage> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    _getSensorTitle(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    _getSensorUnit(),
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.7),
-                      fontSize: 10,
-                    ),
-                  ),
+                  Text(_getSensorTitle(), style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+                  Text(_getSensorUnit(), style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 10)),
                 ],
               ),
-              Text(
-                '${data.last.toStringAsFixed(1)}${_getSensorUnit()}',
-                style: TextStyle(
-                  color: _getSensorColor(),
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              Text('${data.last.toStringAsFixed(1)}${_getSensorUnit()}', style: TextStyle(color: chartColor, fontSize: 18, fontWeight: FontWeight.bold)),
             ],
           ),
           const SizedBox(height: 12),
           Expanded(
-            child: CustomPaint(
-              size: Size(double.infinity, 120),
-              painter: ChartPainter(data, _getSensorColor(), _getSensorUnit()),
+            child: LineChart(
+              LineChartData(
+                gridData: FlGridData(show: true, drawVerticalLine: false, horizontalInterval: range / 4, getDrawingHorizontalLine: (_) => FlLine(color: Colors.white.withOpacity(0.1), strokeWidth: 1)),
+                titlesData: FlTitlesData(
+                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: 35, interval: range / 4, getTitlesWidget: (value, _) => Text(value.toStringAsFixed(0), style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 10)))),
+                  bottomTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: 22, interval: 2, getTitlesWidget: (value, _) {
+                    int i = value.toInt();
+                    if (i < 0 || i >= data.length) return const SizedBox();
+                    var t = DateTime.now().subtract(Duration(seconds: (data.length - 1 - i) * 3));
+                    return Padding(padding: const EdgeInsets.only(top: 4), child: Text('${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}', style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 8)));
+                  })),
+                ),
+                borderData: FlBorderData(show: false),
+                minX: 0, maxX: (data.length - 1).toDouble(),
+                minY: minVal - range * 0.1, maxY: maxVal + range * 0.1,
+                lineBarsData: [
+                  LineChartBarData(
+                    spots: List.generate(data.length, (i) => FlSpot(i.toDouble(), data[i])),
+                    isCurved: true, color: chartColor, barWidth: 2,
+                    dotData: FlDotData(show: true, getDotPainter: (_, __, ___, ____) => FlDotCirclePainter(radius: 3, color: chartColor)),
+                    belowBarData: BarAreaData(show: true, gradient: LinearGradient(colors: [chartColor.withOpacity(0.3), chartColor.withOpacity(0.1)], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
+                  ),
+                ],
+                lineTouchData: LineTouchData(
+                  touchTooltipData: LineTouchTooltipData(
+                    tooltipBgColor: Colors.grey.shade800,
+                    getTooltipItems: (spots) => spots.map((s) => LineTooltipItem('${s.y.toStringAsFixed(1)}${_getSensorUnit()}', const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12))).toList(),
+                  ),
+                ),
+              ),
             ),
           ),
         ],
@@ -421,19 +431,6 @@ class _SensorMonitoringPageState extends State<SensorMonitoringPage> {
   }
 
   Widget _buildControlCard(double temperature, bool switchStatus, Function(bool) onSwitchChanged) {
-    Color lightColor;
-        
-    if (switchStatus == false) {
-      lightColor = Colors.grey;
-    }else{
-      if (temperature > tempThreshold && switchStatus == true) {
-        lightColor = Colors.red;
-
-      } else {
-        lightColor = Colors.green;
-      }
-    }
-
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -464,27 +461,6 @@ class _SensorMonitoringPageState extends State<SensorMonitoringPage> {
             activeThumbColor: Colors.green,
             materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
-          const SizedBox(width: 12),
-          Container(
-            width: 28,
-            height: 28,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: lightColor,
-              boxShadow: [
-                BoxShadow(
-                  color: lightColor.withOpacity(0.5),
-                  blurRadius: 4,
-                  spreadRadius: 1,
-                ),
-              ],
-            ),
-            child: const Icon(
-              Icons.lightbulb,
-              color: Colors.white,
-              size: 14,
-            ),
-          ),
         ],
       ),
     );
@@ -494,8 +470,8 @@ class _SensorMonitoringPageState extends State<SensorMonitoringPage> {
     bool isWarning = false;
     bool isSelected = selectedSensor == sensorType;
     
-    if (title == 'Nhiệt độ' && (value > tempThreshold || value < 10)) isWarning = true;
-    if (title == 'Độ ẩm' && (value > humidityThreshold || value < humidityThreshold)) isWarning = true;
+    if (title == 'Nhiệt độ' && (value > tempThreshold)) isWarning = true;
+    if (title == 'Độ ẩm' && (value > humidityThreshold )) isWarning = true;
     if (title == 'Tốc độ gió' && value > windThreshold) isWarning = true;
     if (title == 'Mưa' && value > rainThreshold) isWarning = true;
 
@@ -701,7 +677,6 @@ class _SensorMonitoringPageState extends State<SensorMonitoringPage> {
               setState(() {
                 currentData.switchStatus = value;
               });
-              // Cập nhật trạng thái switch lên Firebase
               _updateSwitchStatus(selectedArea, value);
             },
           ),
@@ -722,126 +697,3 @@ class _SensorMonitoringPageState extends State<SensorMonitoringPage> {
   }
 }
 
-class ChartPainter extends CustomPainter {
-  final List<double> data;
-  final Color lineColor;
-  final String unit;
-
-  ChartPainter(this.data, this.lineColor, this.unit);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    double minVal = data.reduce(min);
-    double maxVal = data.reduce(max);
-    double range = maxVal - minVal;
-    if (range == 0) range = 1;
-
-    final chartArea = Rect.fromLTRB(30, 10, size.width - 10, size.height - 20);
-    
-    final axisPaint = Paint()
-      ..color = Colors.white.withOpacity(0.3)
-      ..strokeWidth = 1;
-
-    for (int i = 0; i <= 4; i++) {
-      double y = chartArea.top + (chartArea.height / 4) * i;
-      canvas.drawLine(
-        Offset(chartArea.left, y),
-        Offset(chartArea.right, y),
-        axisPaint,
-      );
-      
-      double value = maxVal - (range / 4) * i;
-      final textSpan = TextSpan(
-        text: value.toStringAsFixed(0),
-        style: TextStyle(
-          color: Colors.white.withOpacity(0.6),
-          fontSize: 10,
-        ),
-      );
-      final textPainter = TextPainter(
-        text: textSpan,
-        textDirection: TextDirection.ltr,
-      );
-      textPainter.layout();
-      textPainter.paint(canvas, Offset(5, y - 5));
-    }
-
-    DateTime now = DateTime.now();
-    for (int i = 0; i < data.length; i += 2) {
-      double x = chartArea.left + (chartArea.width / (data.length - 1)) * i;
-      canvas.drawLine(
-        Offset(x, chartArea.bottom),
-        Offset(x, chartArea.bottom + 5),
-        axisPaint,
-      );
-      
-      DateTime timePoint = now.subtract(Duration(seconds: (data.length - 1 - i) * 3));
-      String timeLabel = '${timePoint.hour.toString().padLeft(2, '0')}:${timePoint.minute.toString().padLeft(2, '0')}';
-      
-      final textSpan = TextSpan(
-        text: timeLabel,
-        style: TextStyle(
-          color: Colors.white.withOpacity(0.6),
-          fontSize: 8,
-        ),
-      );
-      final textPainter = TextPainter(
-        text: textSpan,
-        textDirection: TextDirection.ltr,
-      );
-      textPainter.layout();
-      textPainter.paint(canvas, Offset(x - 12, chartArea.bottom + 6));
-    }
-
-    final linePaint = Paint()
-      ..color = lineColor
-      ..strokeWidth = 2
-      ..style = PaintingStyle.stroke;
-
-    final fillPaint = Paint()
-      ..shader = LinearGradient(
-        colors: [
-          lineColor.withOpacity(0.3),
-          lineColor.withOpacity(0.1),
-        ],
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-      ).createShader(chartArea);
-
-    final path = Path();
-    final fillPath = Path();
-
-    for (int i = 0; i < data.length; i++) {
-      double x = chartArea.left + (chartArea.width / (data.length - 1)) * i;
-      double y = chartArea.bottom - ((data[i] - minVal) / range) * chartArea.height;
-
-      if (i == 0) {
-        path.moveTo(x, y);
-        fillPath.moveTo(x, chartArea.bottom);
-        fillPath.lineTo(x, y);
-      } else {
-        path.lineTo(x, y);
-        fillPath.lineTo(x, y);
-      }
-    }
-
-    fillPath.lineTo(chartArea.right, chartArea.bottom);
-    fillPath.close();
-
-    canvas.drawPath(fillPath, fillPaint);
-    canvas.drawPath(path, linePaint);
-
-    final pointPaint = Paint()
-      ..color = lineColor
-      ..style = PaintingStyle.fill;
-
-    for (int i = 0; i < data.length; i++) {
-      double x = chartArea.left + (chartArea.width / (data.length - 1)) * i;
-      double y = chartArea.bottom - ((data[i] - minVal) / range) * chartArea.height;
-      canvas.drawCircle(Offset(x, y), 3, pointPaint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
-}
