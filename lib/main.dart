@@ -647,6 +647,24 @@ class _SensorMonitoringPageState extends State<SensorMonitoringPage> {
                 ],
               ),
             ),
+            
+            ListTile(
+              leading: const Icon(Icons.home, color: Colors.white, size: 18),
+              title: const Text(
+                'Trang chủ',
+                style: TextStyle(color: Colors.white, fontSize: 14),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SensorStationScreen()),
+                );
+              },
+            ),
+
+            const Divider(color: Colors.white24, height: 1),
+
             for (int i = 1; i <= 2; i++)
               ListTile(
                 leading: const Icon(Icons.location_on, color: Colors.white, size: 18),
