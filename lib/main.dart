@@ -5,7 +5,7 @@ import 'login.dart';
 import 'settings.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'arena.dart';
+import 'area.dart';
 import 'package:fl_chart/fl_chart.dart'; // Thêm import này
 
 void main() async {
