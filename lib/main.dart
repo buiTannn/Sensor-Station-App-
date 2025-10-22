@@ -157,7 +157,6 @@ class _SensorMonitoringPageState extends State<SensorMonitoringPage> {
             areaData[i]!.humidity = (data['humidity'] ?? 0.0).toDouble();
             areaData[i]!.windSpeed = (data['windSpeed'] ?? 0.0).toDouble();
             areaData[i]!.rainLevel = (data['rainLevel'] ?? 0.0).toDouble();
-            areaData[i]!.switchStatus = data['switchStatus'] ?? false;
           });
         }
       });
@@ -227,7 +226,6 @@ class _SensorMonitoringPageState extends State<SensorMonitoringPage> {
   void _logout() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isLoggedIn', false);
-    await prefs.remove('username');
     
     Navigator.pushReplacement(
       context,
