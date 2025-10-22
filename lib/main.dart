@@ -55,7 +55,7 @@ class _SplashScreenState extends State<SplashScreen> {
     if (isLoggedIn && username.isNotEmpty) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const SensorMonitoringPage()),
+        MaterialPageRoute(builder: (context) => const SensorStationScreen()),
       );
     } else {
       Navigator.pushReplacement(
@@ -123,7 +123,7 @@ class SensorData {
 
 class SensorMonitoringPage extends StatefulWidget {
   final int areaId;
-  const SensorMonitoringPage({super.key, this.areaId = 1});
+  const SensorMonitoringPage({super.key, required this.areaId});
 
   @override
   _SensorMonitoringPageState createState() => _SensorMonitoringPageState();
@@ -189,8 +189,7 @@ class _SensorMonitoringPageState extends State<SensorMonitoringPage> {
     sensorHistory['windSpeed'] = List.generate(8, (index) => 5.0);
     sensorHistory['rainLevel'] = List.generate(8, (index) => 0.0);
     
-    _listenToSensorData();
-    
+    _listenToSensorData(); 
     _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
       _updateSensorData();
     });

@@ -44,6 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     if (savedUser == _username.text && savedPass == _password.text) {
+      await prefs.setBool('isLoggedIn', true);
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const  SensorStationScreen()),
