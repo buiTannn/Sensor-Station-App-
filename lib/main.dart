@@ -518,13 +518,6 @@ class _SensorMonitoringPageState extends State<SensorMonitoringPage> {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  Text(
-                    '${value.toStringAsFixed(1)}$unit',
-                    style: TextStyle(
-                      color: Colors.grey.shade400,
-                      fontSize: 10,
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -539,7 +532,7 @@ class _SensorMonitoringPageState extends State<SensorMonitoringPage> {
                   ),
                 if (isWarning) const SizedBox(width: 4),
                 Text(
-                  '${value.toStringAsFixed(0)}$unit',
+                  '${value.toStringAsFixed(1)}$unit',
                   style: TextStyle(
                     color: isSelected ? color : (isWarning ? Colors.red : Colors.white),
                     fontSize: 16,
