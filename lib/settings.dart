@@ -35,10 +35,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void initState() {
     super.initState();
-    _tempController = TextEditingController(text: widget.tempThreshold.toInt().toString());
-    _humidityController = TextEditingController(text: widget.humidityThreshold.toInt().toString());
-    _windController = TextEditingController(text: widget.windThreshold.toInt().toString());
-    _rainController = TextEditingController(text: widget.rainThreshold.toInt().toString());
+    _tempController = TextEditingController(text: widget.tempThreshold.toString());
+    _humidityController = TextEditingController(text: widget.humidityThreshold.toString());
+    _windController = TextEditingController(text: widget.windThreshold.toString());
+    _rainController = TextEditingController(text: widget.rainThreshold.toString());
   }
 
   @override
